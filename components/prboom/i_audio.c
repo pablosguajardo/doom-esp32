@@ -65,6 +65,7 @@
 
 extern int sound_inited;
 
+//PSG: no music no FXsound = 0
 int snd_card=1;
 int mus_card=1;
 #define RATE (22050)
@@ -211,7 +212,7 @@ void I_ShutdownSound(void)
 
 void I_InitSound(void) {
 	I_InitMusic();
-	sndhw_init(RATE, snd_cb);
+	//PSG: sndhw_init(RATE, snd_cb);
 
 	// Finished initialization.
     lprintf(LO_INFO,"I_InitSound: sound ready");

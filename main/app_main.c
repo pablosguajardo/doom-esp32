@@ -45,8 +45,9 @@ extern void jsInit();
 
 void doomEngineTask(void *pvParameters)
 {
-    char const *argv[]={"doom","-cout","ICWEFDA", NULL};
-    doom_main(3, argv);
+	//PSG: Add params:
+    char const *argv[]={"doom","-cout","ICWEFDA","nosound","nomusic","nosfx", NULL};
+    doom_main(6, argv);
 }
 
 void app_main()

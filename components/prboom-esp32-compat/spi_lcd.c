@@ -26,7 +26,7 @@
 
 #include "sdkconfig.h"
 
-
+//PSG: TODO leer de la configuracion:
 #if 1
 #define PIN_NUM_MISO -1
 #define PIN_NUM_MOSI 6

@@ -1342,6 +1342,9 @@ static void D_DoomMainSetup(void)
     int nosound = M_CheckParm("-nosound");
     nomusicparm = nosound || M_CheckParm("-nomusic");
     nosfxparm   = nosound || M_CheckParm("-nosfx");
+    //PSG: Test M_CheckParm
+    lprintf(LO_INFO,"nomusicparm:%d nosfxparm:%d nosound:%d\n",nomusicparm,nosfxparm,nosound);
+
   }
   //jff end of sound/music command line parms
 
