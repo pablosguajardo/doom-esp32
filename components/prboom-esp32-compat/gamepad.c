@@ -86,28 +86,13 @@ void gamepadPoll(void)
 }
 
 
-void jsTask(void *arg) {
-	int oldJoyVal=0xFFFF;
-	printf("Joystick task starting.\n");
-	while(1) {
-		vTaskDelay(20/portTICK_PERIOD_MS);
-//		joyVal=psxReadInput();
-//PSG no va touch:		joyVal=tsJsInputGet();
-//		if (joyVal!=oldJoyVal) printf("Joy: %x\n", joyVal^0xffff);
-		oldJoyVal=joyVal;
-	}
-}
-
 void gamepadInit(void)
 {
-	lprintf(LO_INFO, "gamepadInit: Initializing game pad.\n");
+	lprintf(LO_INFO, "gamepad disabled.\n");
 }
 
-void jsInit() {
-	//Starts the js task
-//	psxcontrollerInit();
-//PSG no imput:
-	tsJsInputInit();
-	xTaskCreatePinnedToCore(&jsTask, "js", 5000, NULL, 7, NULL, 0);
+// Input layer completely disabled for now
+void jsInit()
+{
+	// Do nothing
 }
-

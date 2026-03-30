@@ -379,6 +379,9 @@ static void D_DoomLoop(void)
   auto_shot_count = auto_shot_time;
   M_DoScreenShot(auto_shot_fname);
       }
+
+      // Yield to FreeRTOS to avoid Task WDT reset
+      I_uSleep(100);
     }
 }
 

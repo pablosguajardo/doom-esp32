@@ -23,6 +23,10 @@
 #include "soc/gpio_struct.h"
 #include "driver/gpio.h"
 #include "esp_heap_caps.h"
+#include "doomdef.h"
+
+#define LCD_WIDTH  SCREENWIDTH
+#define LCD_HEIGHT SCREENHEIGHT
 
 #include "sdkconfig.h"
 
@@ -321,9 +325,9 @@ void IRAM_ATTR displayTask(void *arg) {
 		uint8_t *myData=(uint8_t*)currFbPtr;
 #endif
 
-		send_header_start(spi, 0, 0, 320, 240);
+		send_header_start(spi, 0, 0, LCD_WIDTH, LCD_HEIGHT);
 		send_header_cleanup(spi);
-		for (x=0; x<320*240; x+=MEM_PER_TRANS) {
+		for (x=0; x<LCD_WIDTH*LCD_HEIGHT; x+=MEM_PER_TRANS) {
 #ifdef DOUBLE_BUFFER
 			for (i=0; i<MEM_PER_TRANS; i+=4) {
 				uint32_t d=currFbPtr[(x+i)/4];
@@ -374,7 +378,7 @@ void spi_lcd_wait_finish() {
 
 void spi_lcd_send(uint16_t *scr) {
 #ifdef DOUBLE_BUFFER
-	memcpy(currFbPtr, scr, 320*240);
+	memcpy(currFbPtr, scr, LCD_WIDTH*LCD_HEIGHT);
 	//Theoretically, also should double-buffer the lcdpal array... ahwell.
 #else
 	currFbPtr=scr;
@@ -387,7 +391,7 @@ void spi_lcd_init() {
     dispSem=xSemaphoreCreateBinary();
     dispDoneSem=xSemaphoreCreateBinary();
 #ifdef DOUBLE_BUFFER
-	currFbPtr=heap_caps_malloc(320*240, /*MALLOC_CAP_32BIT*/MALLOC_CAP_SPIRAM);
+	currFbPtr=heap_caps_malloc(LCD_WIDTH*LCD_HEIGHT, /*MALLOC_CAP_32BIT*/MALLOC_CAP_SPIRAM);
 #endif
 #if CONFIG_FREERTOS_UNICORE
 	xTaskCreatePinnedToCore(&displayTask, "display", 6000, NULL, 6, NULL, 0);

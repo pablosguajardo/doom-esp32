@@ -1,7 +1,6 @@
 ## IDF Component Manager Manifest File
 dependencies:
   espressif/es8311: "^1.0.0"
-  espressif/esp_lcd_touch_tt21100: "==1.0.0"
   ## Required IDF version
   idf:
     version: ">=4.1.0"

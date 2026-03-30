@@ -62,7 +62,15 @@ void app_main()
 	part=esp_partition_find_first(66, 7, NULL);
 	if (part==0) printf("Couldn't find prboom wad part!\n");
 
+	printf("app_main: before spi_lcd_init()\n");
 	spi_lcd_init();
+	printf("app_main: after spi_lcd_init()\n");
+
+	printf("app_main: before jsInit()\n");
 	jsInit();
-	xTaskCreatePinnedToCore(&doomEngineTask, "doomEngine", 22480, NULL, 5, NULL, 0);
+	printf("app_main: after jsInit()\n");
+
+	printf("app_main: before xTaskCreate()\n");
+	xTaskCreatePinnedToCore(&doomEngineTask, "doomEngine", 22480, NULL, 5, NULL, 1);
+	printf("app_main: after xTaskCreate()\n");
 }

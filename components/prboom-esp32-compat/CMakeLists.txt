@@ -24,7 +24,6 @@ PRIV_REQUIRES
   esp_partition
   driver
   es8311
-  esp_lcd_touch_tt21100
 )
 
 #Need this otherwise linking fails because of some sort of link optimization for sndhw...
