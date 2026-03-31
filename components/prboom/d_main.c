@@ -380,8 +380,8 @@ static void D_DoomLoop(void)
   M_DoScreenShot(auto_shot_fname);
       }
 
-      // Yield to FreeRTOS to avoid Task WDT reset
-      I_uSleep(100);
+      //PSG: ver..... Yield to FreeRTOS to avoid Task WDT reset
+      I_uSleep(1);
     }
 }
 
