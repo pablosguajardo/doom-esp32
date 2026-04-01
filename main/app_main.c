@@ -38,6 +38,8 @@
 #include "i_system.h"
 
 #include "spi_lcd.h"
+#include "esp_system.h"
+#include "esp_task_wdt.h"
 
 
 extern void jsInit();
@@ -45,6 +47,9 @@ extern void jsInit();
 
 void doomEngineTask(void *pvParameters)
 {
+    // Register this task to Task Watchdog (Core 1)
+    esp_task_wdt_add(NULL);
+
 	//PSG: Add params:
     char const *argv[]={"doom","-cout","ICWEFDA","nosound","nomusic","nosfx", NULL};
     doom_main(6, argv);
@@ -52,6 +57,8 @@ void doomEngineTask(void *pvParameters)
 
 void app_main()
 {
+	printf("Reset reason: %d\n", esp_reset_reason());
+
 	int i;
 	const esp_partition_t* part;
 	spi_flash_mmap_handle_t hdoomwad;
@@ -71,6 +78,6 @@ void app_main()
 	printf("app_main: after jsInit()\n");
 
 	printf("app_main: before xTaskCreate()\n");
-	xTaskCreatePinnedToCore(&doomEngineTask, "doomEngine", 22480, NULL, 5, NULL, 1);
+	xTaskCreatePinnedToCore(&doomEngineTask, "doomEngine", 32768, NULL, 5, NULL, 0);
 	printf("app_main: after xTaskCreate()\n");
 }

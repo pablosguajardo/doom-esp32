@@ -82,6 +82,7 @@
 #include "d_deh.h"  // Ty 04/08/98 - Externalizations
 #include "lprintf.h"  // jff 08/03/98 - declaration of lprintf
 #include "am_map.h"
+#include "esp_task_wdt.h"
 
 void GetFirstMap(int *ep, int *map); // Ty 08/29/98 - add "-warp x" functionality
 static void D_PageDrawer(void);
@@ -339,6 +340,9 @@ static void D_DoomLoop(void)
 {
   for (;;)
     {
+      // Feed Task Watchdog to prevent TG1WDT_SYS_RST
+      esp_task_wdt_reset();
+
       WasRenderedInTryRunTics = false;
       // frame syncronous IO operations
       I_StartFrame ();
@@ -380,8 +384,8 @@ static void D_DoomLoop(void)
   M_DoScreenShot(auto_shot_fname);
       }
 
-      //PSG: ver..... Yield to FreeRTOS to avoid Task WDT reset
-      I_uSleep(1);
+      // Yield enough time to avoid Task WDT reset under heavy rendering load
+      I_uSleep(1000);
     }
 }
 

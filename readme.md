@@ -54,32 +54,48 @@ idf.py -p COM5 monitor
 ---
 # Para ver errores:
 
-xtensa-esp32s3-elf-addr2line -pfiaC -e build\esp-doom.elf 0x420698D3:0x3FCA1F80 0x42069CF0:0x3FCA1FA0 0x40378AAD:0x3FCA1FD0 0x42008662:0x3FCCF800 0x42009527:0x3FCCF830 0x42008091:0x3FCCF850 0x42007BAE:0x3FCCF870 0x42070352:0x3FCCF890 0x4206F089:0x3FCCF8B0 0x4206F0E6:0x3FCCF8D0 0x4207B601:0x3FCCF900 0x4207874F:0x3FCCFA20 0x420703C9:0x3FCCFD40 0x4208A0C1:0x3FCCFD70 0x4038521D:0x3FCCFDA0 0x42061B8D:0x3FCCFDF0 0x4206909E:0x3FCCFE50 0x42068EDB:0x3FCCFE90 0x42009FDE:0x3FCCFEB0 0x4205733D:0x3FCCFEE0 0x42051710:0x3FCCFF00 0x42051A1E:0x3FCCFF30 0x420282E4:0x3FCCFF50 0x42010AE1:0x3FCCFF70 0x4200CB89:0x3FCCFFA0 0x4200CD6B:0x3FCCFFF0 0x42009C63:0x3FCD0010 0x420099D7:0x3FCD0030 0x4037E641:0x3FCD0070
+xtensa-esp32s3-elf-addr2line -pfiaC -e build\esp-doom.elf 0x4037A1E6:0x3FCA1670 0x40378995:0x3FCA1690 0x42027571:0x3FCCD5C0 0x42027511:0x3FCCD5E0 0x4202940C:0x3FCCD600 0x40377DC7:0x3FCCD620 0x42054496:0x3FCCD700 0x4200A421:0x3FCCD720 0x4200AE6D:0x3FCCD740 0x4200B1CC:0x3FCCD760 0x4200BDEE:0x3FCCD780 0x42009B13:0x3FCCD7A0 0x420098A7:0x3FCCD7C0 0x4037D8D1:0x3FCCD800
 
 ---
+# Watchdog config
+Component config
+  → ESP System Settings
+      → [ ] Interrupt watchdog   (desactivarlo)
 
 
-
+---
 # configurar botones:
 Path:
 \components\prboom-esp32-compat\gamepad.c
 
 GPIO mapping:
-PIN_UP      35
-PIN_DOWN    36
-PIN_LEFT    37
-PIN_RIGHT   38
-PIN_FIRE    39
-PIN_USE     40
-PIN_STRAFE  41
-PIN_RUN     42
+PIN_UP      8
+PIN_DOWN    9
+PIN_LEFT    10
+PIN_RIGHT   11
+PIN_FIRE    12
+PIN_USE     13
+PIN_STRAFE  14
+PIN_RUN     16
 
 
+# audio:
+GPIO mapping:
+BCLK  = 17
+WS    = 47
+DOUT  = 15
+MCLK  = 2 (no utilizado por MAX98357A)
 
 
-
-
-
+# pantalla:
+GPIO mapping:
+PIN_NUM_MISO -1
+PIN_NUM_MOSI 6
+PIN_NUM_CLK  7
+PIN_NUM_CS   5
+PIN_NUM_DC   4
+PIN_NUM_RST  48
+PIN_NUM_BCKL 45
 
 
 
@@ -145,25 +161,3 @@ El flujo de audio es:
 ```
 Doom → snd_cb → audio_task → i2s_channel_write → MAX98357A → Parlante
 ```
-
-No se utiliza:
-- ES8311
-- I2C
-- Touchscreen
-- Hardware específico del ESP32-S3-BOX
-
----
-
-## ✅ Notas importantes
-
-- El MAX98357A no necesita MCLK.
-- Funciona directamente con I2S estándar.
-- Si no hay sonido, verificar:
-  - Conexiones
-  - Fuente de alimentación
-  - Parlante
-  - Masa común entre ESP32 y módulo
-
----
-
-Con esta configuración el proyecto es totalmente compatible con cualquier ESP32-S3 + DAC I2S externo.
