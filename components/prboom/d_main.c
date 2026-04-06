@@ -341,7 +341,7 @@ static void D_DoomLoop(void)
   for (;;)
     {
       // Feed Task Watchdog to prevent TG1WDT_SYS_RST
-      esp_task_wdt_reset();
+      // esp_task_wdt_reset();  // Disabled: Doom task not registered in WDT
 
       WasRenderedInTryRunTics = false;
       // frame syncronous IO operations

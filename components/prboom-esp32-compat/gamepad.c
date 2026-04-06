@@ -79,7 +79,7 @@ static const JsKeyMap keymap[] = {
     {0x1000, &key_weapontoggle},
 
     {0x8,    &key_escape},
-    {0x1,    &key_map},
+    {0x1,    &key_map},         
 
     {0x400,  &key_strafeleft},
     {0x100,  &key_speed},

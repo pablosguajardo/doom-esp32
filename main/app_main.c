@@ -48,7 +48,8 @@ extern void jsInit();
 void doomEngineTask(void *pvParameters)
 {
     // Register this task to Task Watchdog (Core 1)
-    esp_task_wdt_add(NULL);
+    // Disable WDT for Doom engine task (render loop is long)
+    // esp_task_wdt_add(NULL);
 
 	//PSG: Add params:
     char const *argv[]={"doom","-cout","ICWEFDA","nosound","nomusic","nosfx", NULL};
@@ -58,6 +59,9 @@ void doomEngineTask(void *pvParameters)
 void app_main()
 {
 	printf("Reset reason: %d\n", esp_reset_reason());
+
+	// Disable Task Watchdog globally (Doom has long blocking loops)
+	esp_task_wdt_deinit();
 
 	int i;
 	const esp_partition_t* part;
