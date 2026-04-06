@@ -82,6 +82,10 @@ void app_main()
 	printf("app_main: after jsInit()\n");
 
 	printf("app_main: before xTaskCreate()\n");
-	xTaskCreatePinnedToCore(&doomEngineTask, "doomEngine", 32768, NULL, 5, NULL, 0);
+	// Run Doom on Core 1 so Core 0 can service system/idle tasks (prevents TG0WDT)
+	xTaskCreatePinnedToCore(&doomEngineTask, "doomEngine", 32768, NULL, 5, NULL, 1);
 	printf("app_main: after xTaskCreate()\n");
+
+	// Delete main task instead of returning (prevents scheduler side effects)
+	vTaskDelete(NULL);
 }

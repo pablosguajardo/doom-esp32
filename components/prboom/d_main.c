@@ -384,8 +384,8 @@ static void D_DoomLoop(void)
   M_DoScreenShot(auto_shot_fname);
       }
 
-      // Yield enough time to avoid Task WDT reset under heavy rendering load
-      I_uSleep(1000);
+      // Yield to FreeRTOS without breaking Doom timing
+      taskYIELD();
     }
 }
 
