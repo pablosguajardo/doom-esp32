@@ -86,10 +86,9 @@ idf.py -p COM5 flash
 
 ```bat
 @echo off
-idf.py -p COM5 erase-flash
+idf.py fullclean
 idf.py build
 idf.py -p COM5 flash
-python "%IDF_PATH%\components\esptool_py\esptool\esptool.py" --chip esp32s3 --port COM5 write_flash 0x280000 DOOM1.WAD
 pause
 ```
 
@@ -98,10 +97,9 @@ pause
 ### PowerShell (.ps1)
 
 ```powershell
-idf.py -p COM5 erase-flash
+idf.py fullclean
 idf.py build
 idf.py -p COM5 flash
-python "$env:IDF_PATH\components\esptool_py\esptool\esptool.py" --chip esp32s3 --port COM5 write_flash 0x280000 DOOM1.WAD
 ```
 
 ---
