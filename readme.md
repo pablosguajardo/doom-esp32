@@ -208,3 +208,32 @@ Component config
 ---
 
 🚀 Ready to run DOOM on ESP32-S3
+
+
+
+Known Bugs
+----------
+
+- ESP32-DOOM does not support saving or loading of savegames.
+
+
+Credits
+-------
+
+Doom is released by iD software in 1999 under the Gnu GPL. PrBoom is a modification of this code; its authors are credited in 
+the ``components/prboom/AUTHORS`` file. The ESP32 modifications are done by Espressif and licensed under the Apache license, version 2.0.
+
+
+License
+-------
+
+This project is open source and freely available for anyone to use, modify, and distribute.
+
+You are welcome to:
+- Use the code for personal or commercial projects
+- Modify and adapt it to your needs
+- Share improvements with the community
+
+This repository is provided “as is”, without warranty of any kind.
+
+If you find this project useful, contributions, feedback, and improvements are always welcome.
