@@ -226,7 +226,7 @@ typedef struct {
 	int used;
 } MmapHandle;
 
-#define NO_MMAP_HANDLES 128
+#define NO_MMAP_HANDLES 512
 static MmapHandle mmapHandle[NO_MMAP_HANDLES];
 
 static int nextHandle=0;
