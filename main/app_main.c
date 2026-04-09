@@ -40,6 +40,7 @@
 #include "spi_lcd.h"
 #include "esp_system.h"
 #include "esp_task_wdt.h"
+#include "esp_heap_caps.h"
 
 // FOR BT:
 #include "sdkconfig.h"
@@ -268,12 +269,6 @@ void SetupBt()
 	if (JOYSTICK_OPTION == 2)
 	{
 		printf("Bt is enabled. Init\n");
-		esp_err_t ret = nvs_flash_init();
-		if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND)
-		{
-			ESP_ERROR_CHECK(nvs_flash_erase());
-			ESP_ERROR_CHECK(nvs_flash_init());
-		}
 
 		rx_queue = xQueueCreate(RX_QUEUE_LEN, sizeof(char));
 		if (!rx_queue)
@@ -330,23 +325,34 @@ void SetupBt()
 
 void doomEngineTask(void *pvParameters)
 {
-	// Register this task to Task Watchdog (Core 1)
-	// Disable WDT for Doom engine task (render loop is long)
-	// esp_task_wdt_add(NULL);
+	printf("doomEngineTask started\n");
+	printf("Free heap: %u bytes\n", esp_get_free_heap_size());
+	printf("Free internal heap: %u bytes\n",
+	       heap_caps_get_free_size(MALLOC_CAP_INTERNAL));
 
-	// PSG: Add params:
 	char const *argv[] = {"doom", "-cout", "ICWEFDA", "nosound", "nomusic", "nosfx", NULL};
 	doom_main(6, argv);
 }
+
+/* ---- Static stack in PSRAM to avoid internal RAM fragmentation ---- */
+EXT_RAM_ATTR static StackType_t doomStack[32768];
+static StaticTask_t doomTaskBuffer;
 
 void app_main()
 {
 	printf("Reset reason: %d\n", esp_reset_reason());
 
+	/* NVS must be initialized BEFORE starting BT controller */
+	esp_err_t ret = nvs_flash_init();
+	if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND)
+	{
+		ESP_ERROR_CHECK(nvs_flash_erase());
+		ESP_ERROR_CHECK(nvs_flash_init());
+	}
+
 	SetupBt();
 
-	// Disable Task Watchdog globally (Doom has long blocking loops)
-	esp_task_wdt_deinit();
+	// Keep system watchdog active (required for BLE stability)
 
 	int i;
 	const esp_partition_t *part;
@@ -369,8 +375,27 @@ void app_main()
 	printf("app_main: after jsInit()\n");
 
 	printf("app_main: before xTaskCreate()\n");
-	// Run Doom on Core 1 so Core 0 can service system/idle tasks (prevents TG0WDT)
-	xTaskCreatePinnedToCore(&doomEngineTask, "doomEngine", 32768, NULL, 5, NULL, 1);
+
+	printf("Heap before Doom task: %u bytes\n", esp_get_free_heap_size());
+	printf("Internal heap before Doom task: %u bytes\n",
+	       heap_caps_get_free_size(MALLOC_CAP_INTERNAL));
+
+	TaskHandle_t doomHandle = xTaskCreateStaticPinnedToCore(
+	    doomEngineTask,
+	    "doomEngine",
+	    32768,
+	    NULL,
+	    5,
+	    doomStack,
+	    &doomTaskBuffer,
+	    1);
+
+	if (doomHandle == NULL) {
+	    printf("ERROR: Doom static task creation failed!\n");
+	} else {
+	    printf("Doom static task created successfully\n");
+	}
+
 	printf("app_main: after xTaskCreate()\n");
 
 	// Delete main task instead of returning (prevents scheduler side effects)

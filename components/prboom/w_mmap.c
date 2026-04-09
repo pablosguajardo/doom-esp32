@@ -122,8 +122,28 @@ const void* W_CacheLumpNum(int lump)
   if ((unsigned)lump >= (unsigned)numlumps)
     I_Error ("W_CacheLumpNum: %i >= numlumps",lump);
 #endif
-	cachelump[lump].mmapadr=I_Mmap(NULL, W_LumpLength(lump), 0, 0, lumpinfo[lump].wadfile->handle, lumpinfo[lump].position);
-	return (char*)cachelump[lump].mmapadr;
+
+  /* Disable flash mmap usage to avoid MMU exhaustion when BLE is active.
+     Always copy lump into heap instead of mapping flash. */
+
+  size_t len = W_LumpLength(lump);
+
+  if (!cachelump[lump].cache) {
+    Z_Malloc(len, PU_CACHE, &cachelump[lump].cache);
+
+    /* Seek to lump position and read using I_Lseek */
+    I_Lseek(lumpinfo[lump].wadfile->handle,
+            lumpinfo[lump].position,
+            SEEK_SET);
+
+    I_Read(lumpinfo[lump].wadfile->handle,
+           cachelump[lump].cache,
+           len);
+  }
+
+  cachelump[lump].locks = -2; /* mark as heap-backed, not mmap */
+
+  return cachelump[lump].cache;
 }
 
 /*
@@ -168,8 +188,7 @@ const void* W_LockLumpNum(int lump)
 
 void W_UnlockLumpNum(int lump) {
   if (cachelump[lump].locks == -1) {
-    // this lump is memory mapped
-    I_Munmap(cachelump[lump].mmapadr, W_LumpLength(lump));
+    /* mmap disabled: nothing to unmap */
     return;
   }
 #ifdef SIMPLECHECKS
@@ -184,4 +203,3 @@ void W_UnlockLumpNum(int lump) {
   if (cachelump[lump].locks == 0)
     Z_ChangeTag(cachelump[lump].cache, PU_CACHE);
 }
-

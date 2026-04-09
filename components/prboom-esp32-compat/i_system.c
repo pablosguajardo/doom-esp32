@@ -318,9 +318,14 @@ int I_Munmap(void *addr, size_t length) {
 
 void I_Read(int ifd, void* vbuf, size_t sz)
 {
-	uint8_t *d=I_Mmap(NULL, sz, 0, 0, ifd, fds[ifd].offset);
-	memcpy(vbuf, d, sz);
-	I_Munmap(d, sz);
+	/* Use direct partition read instead of mmap to avoid MMU exhaustion
+	   when BLE or other subsystems consume MMU entries. */
+	esp_partition_read(
+		fds[ifd].part,
+		fds[ifd].offset,
+		vbuf,
+		sz
+	);
 }
 
 const char *I_DoomExeDir(void)
