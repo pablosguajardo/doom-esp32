@@ -14,9 +14,14 @@
 
 ---
 
-## ⚙️ Configuration
+## Run Esp-Idf manually
+```bat
+C:\esp\v5.2\esp-idf\export.bat
+```
 
-```bash
+## ⚙️ App Configuration
+
+```bat
 idf.py menuconfig
 ```
 
@@ -24,7 +29,7 @@ idf.py menuconfig
 
 ## 🔄 Dependency Changes
 
-```bash
+```bat
 idf.py reconfigure
 ```
 
@@ -32,30 +37,36 @@ idf.py reconfigure
 
 ## 🏗️ Build
 
-```bash
+```bat
 idf.py build
 ```
 
 ### Clean build (recommended)
 
-```bash
+```bat
 idf.py fullclean
+```
+
+### Or run both:
+
+```bat
+idf.py fullclean build
 ```
 
 ---
 
 ## 🚀 Deployment (Step by Step)
 
-### 1️⃣ Partition Table
+### 1️- Partition Table
 
-```bash
+```bat
 idf.py partition-table
 idf.py -p COM5 partition-table-flash
 ```
 
 ---
 
-### 2️⃣ Flash WAD Files
+### 2️- Flash WAD Files
 
 #### CMD
 
@@ -67,14 +78,15 @@ python "%IDF_PATH%\components\esptool_py\esptool\esptool.py" --chip esp32s3 --po
 #### PowerShell
 
 ```powershell
+python "$env:IDF_PATH\components\esptool_py\esptool\esptool.py" --chip esp32s3 --port COM5 --baud 230400 write_flash 0x200000 prboom.wad
 python "$env:IDF_PATH\components\esptool_py\esptool\esptool.py" --chip esp32s3 --port COM5 --baud 230400 write_flash 0x280000 DOOM1.WAD
 ```
 
 ---
 
-### 3️⃣ Flash Firmware
+### 3️- Flash Firmware
 
-```bash
+```bat
 idf.py -p COM5 flash
 ```
 
@@ -108,7 +120,7 @@ idf.py -p COM5 flash
 
 ### Serial Monitor
 
-```bash
+```bat
 idf.py -p COM5 monitor
 ```
 
@@ -116,10 +128,8 @@ idf.py -p COM5 monitor
 
 ### Decode Backtrace
 
-```bash
-xtensa-esp32s3-elf-addr2line -pfiaC -e build\esp-doom.elf \
-0x40056f72:0x3fcd0a20 \
-0x42009e84:0x3fcd0a30
+```bat
+xtensa-esp32s3-elf-addr2line -pfiaC -e build\esp-doom.elf 0x40375e16:0x3fcb1690 0x40382039:0x3fcb16b0 0x4038978d:0x3fcb16d0 0x40376e63:0x3fcb1740 0x4037704a:0x3fcb1760 0x420a7e61:0x3fcb1780 0x420a4fdb:0x3fcb18a0 0x4209cc55:0x3fcb1bc0 0x420b7aad:0x3fcb1bf0 0x4038963d:0x3fcb1c20 0x4207bea5:0x3fcb1c70 0x420812e2:0x3fcb1cd0 0x4208108f:0x3fcb1d10 0x4200b207:0x3fcb1d30 0x42071589:0x3fcb1d60 0x4206b904:0x3fcb1d80 0x4206bc12:0x3fcb1db0 0x42044548:0x3fcb1dd0 0x4202b5e1:0x3fcb1df0 0x42027599:0x3fcb1e20 0x4202777b:0x3fcb1e70 0x4200ae67:0x3fcb1e90 0x4200a6ad:0x3fcb1eb0 0x40382b99:0x3fcb1ef0
 ```
 
 ---
@@ -133,10 +143,41 @@ Component config
   → ESP System Settings
       → [ ] Interrupt watchdog
 ```
+---
+## 🎮 Controls
+
+SET: HW_JOYSTICK_OPTION 
+Default: 2
+Available options: 
+if you set it to 1, it compiles to be used with GPIO buttons; 
+if you set it to 2, it compiles to use a joystick via Bluetooth.
+
+run:
+idf.py menuconfig
+
+ ESP32-Doom platform-specific configuration →
+	(2) Options: 1=GPIO buttons, 2= BT joystick  
+
+### Bluetooth Configuration (HW_JOYSTICK_OPTION = 2)
+
+---
+🔧 Required configuration (VERY important)
+
+Run:
+
+idf.py menuconfig
+
+
+📍 Component config
+  -> Bluetooth
+     [*] Bluetooth
+     Host ---> NimBLE - BLE only
+     Controller ---> Enabled
+
 
 ---
 
-## 🎮 Controls (GPIO)
+### (GPIO)Configuration (HW_JOYSTICK_OPTION = 1)
 
 ### Directions
 
@@ -207,24 +248,20 @@ Component config
 
 ---
 
-🚀 Ready to run DOOM on ESP32-S3
-
-
-
-Known Bugs
+## Known Bugs
 ----------
 
 - ESP32-DOOM does not support saving or loading of savegames.
 
 
-Credits
+## Credits
 -------
 
 Doom is released by iD software in 1999 under the Gnu GPL. PrBoom is a modification of this code; its authors are credited in 
 the ``components/prboom/AUTHORS`` file. The ESP32 modifications are done by Espressif and licensed under the Apache license, version 2.0.
 
 
-License
+## License
 -------
 
 This project is open source and freely available for anyone to use, modify, and distribute.
@@ -237,3 +274,7 @@ You are welcome to:
 This repository is provided “as is”, without warranty of any kind.
 
 If you find this project useful, contributions, feedback, and improvements are always welcome.
+
+---
+
+🚀 Ready to run DOOM on ESP32-S3

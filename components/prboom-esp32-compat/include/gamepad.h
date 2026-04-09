@@ -4,5 +4,6 @@
 void gamepadInit(void);
 void gamepadPoll(void);
 
-
 #endif
+
+void readCommands(char command);

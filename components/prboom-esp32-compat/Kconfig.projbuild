@@ -155,4 +155,11 @@ config HW_PSX_CMD
 	range 1 48
 	default 2
 
+config HW_JOYSTICK_OPTION
+	int "Options: 1=GPIO buttons, 2= BT joystick"
+	default 2
+	range 1 2
+	help
+		Available options: if you set it to 1, it compiles to be used with GPIO buttons; if you set it to 2, it compiles to use a joystick via Bluetooth.
+
 endmenu
