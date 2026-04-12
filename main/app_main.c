@@ -100,8 +100,15 @@ static int rx_chr_access_cb(uint16_t conn_handle,
                             struct ble_gatt_access_ctxt *ctxt,
                             void *arg)
 {
+    if (ctxt->op == BLE_GATT_ACCESS_OP_READ_CHR) {
+        const char *dummy = "OK";
+        os_mbuf_append(ctxt->om, dummy, strlen(dummy));
+        return 0;
+    }
+
     if (ctxt->op != BLE_GATT_ACCESS_OP_WRITE_CHR) {
-        return BLE_ATT_ERR_UNLIKELY;
+        /* Do not reject other operations to avoid client disconnects */
+        return 0;
     }
 
     uint16_t len = OS_MBUF_PKTLEN(ctxt->om);
@@ -135,7 +142,10 @@ static const struct ble_gatt_svc_def gatt_svcs[] = {
             {
                 .uuid = &rx_char_uuid.u,
                 .access_cb = rx_chr_access_cb,
-                .flags = BLE_GATT_CHR_F_WRITE | BLE_GATT_CHR_F_WRITE_NO_RSP,
+                .flags = BLE_GATT_CHR_F_READ |
+                         BLE_GATT_CHR_F_WRITE |
+                         BLE_GATT_CHR_F_WRITE_NO_RSP |
+                         BLE_GATT_CHR_F_NOTIFY,
             },
             {0}
         }
@@ -158,7 +168,8 @@ static int ble_gap_event_cb(struct ble_gap_event *event, void *arg)
             return 0;
 
         case BLE_GAP_EVENT_DISCONNECT:
-            ESP_LOGI(TAG, "Cliente desconectado");
+            ESP_LOGI(TAG, "Cliente desconectado. Reason=%d",
+                     event->disconnect.reason);
             ble_app_advertise();
             return 0;
 
@@ -166,6 +177,26 @@ static int ble_gap_event_cb(struct ble_gap_event *event, void *arg)
             ESP_LOGI(TAG, "Advertising completo, reiniciando");
             ble_app_advertise();
             return 0;
+
+        case BLE_GAP_EVENT_MTU:
+            ESP_LOGI(TAG, "MTU updated: conn_handle=%d mtu=%d",
+                     event->mtu.conn_handle,
+                     event->mtu.value);
+            return 0;
+
+        case BLE_GAP_EVENT_ENC_CHANGE:
+            ESP_LOGI(TAG, "Encryption change: status=%d",
+                     event->enc_change.status);
+            return 0;
+
+        case BLE_GAP_EVENT_CONN_UPDATE:
+            ESP_LOGI(TAG, "Connection update: status=%d",
+                     event->conn_update.status);
+            return 0;
+
+        case BLE_GAP_EVENT_REPEAT_PAIRING:
+            ESP_LOGI(TAG, "Repeat pairing event");
+            return BLE_GAP_REPEAT_PAIRING_RETRY;
 
         default:
             return 0;
@@ -191,6 +222,18 @@ static void ble_app_advertise(void)
     fields.name_is_complete = 1;
 
     rc = ble_gap_adv_set_fields(&fields);
+    if (rc != 0) {
+        ESP_LOGE(TAG, "ble_gap_adv_set_fields failed: %d", rc);
+        return;
+    }
+
+    /* Put UUID in scan response to avoid 31-byte adv limit */
+    memset(&fields, 0, sizeof(fields));
+    fields.uuids128 = (ble_uuid128_t *)&service_uuid;
+    fields.num_uuids128 = 1;
+    fields.uuids128_is_complete = 1;
+
+    rc = ble_gap_adv_rsp_set_fields(&fields);
     if (rc != 0) {
         ESP_LOGE(TAG, "ble_gap_adv_set_fields failed: %d", rc);
         return;
@@ -289,21 +332,37 @@ void SetupBt()
 			return;
 		}
 
-		rc = ble_gatts_add_svcs(gatt_svcs);
-		if (rc != 0)
-		{
-			ESP_LOGE(TAG, "ble_gatts_add_svcs failed: %d", rc);
-			return;
-		}
+        rc = ble_gatts_add_svcs(gatt_svcs);
+        if (rc != 0)
+        {
+            ESP_LOGE(TAG, "ble_gatts_add_svcs failed: %d", rc);
+            return;
+        }
 
-		rc = ble_svc_gap_device_name_set(DEVICE_NAME);
+        /* VERY IMPORTANT: start GATT server */
+        rc = ble_gatts_start();
+        if (rc != 0)
+        {
+            ESP_LOGE(TAG, "ble_gatts_start failed: %d", rc);
+            return;
+        }
+
+        rc = ble_svc_gap_device_name_set(DEVICE_NAME);
 		if (rc != 0)
 		{
 			ESP_LOGE(TAG, "ble_svc_gap_device_name_set failed: %d", rc);
 			return;
 		}
 
-		ble_hs_cfg.sync_cb = ble_on_sync;
+        ble_hs_cfg.sync_cb = ble_on_sync;
+
+        /* Enable basic bonding to satisfy clients requesting security */
+        ble_hs_cfg.sm_io_cap = BLE_HS_IO_NO_INPUT_OUTPUT;
+        ble_hs_cfg.sm_bonding = 1;
+        ble_hs_cfg.sm_mitm = 0;
+        ble_hs_cfg.sm_sc = 1;
+        ble_hs_cfg.sm_our_key_dist = BLE_SM_PAIR_KEY_DIST_ENC;
+        ble_hs_cfg.sm_their_key_dist = BLE_SM_PAIR_KEY_DIST_ENC;
 
         nimble_port_freertos_init(host_task);
 
