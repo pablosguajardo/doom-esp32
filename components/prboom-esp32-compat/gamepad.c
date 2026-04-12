@@ -174,32 +174,32 @@ void readCommands(char command)
     case 'A':
         lprintf(LO_INFO, "triangulo");
         // key_weapontoggle
-        ev.type = key_weapontoggle;
-        ev.data1 = key_fire;
+        ev.type = ev_keydown;
+        ev.data1 = key_weapontoggle;
         D_PostEvent(&ev);
         break;
 
     case 'C':
         lprintf(LO_INFO, "cross");
         // key_use
-        ev.type = key_use;
-        ev.data1 = key_fire;
+        ev.type = ev_keydown;
+        ev.data1 = key_use;
         D_PostEvent(&ev);
         break;
 
     case 'B':
         lprintf(LO_INFO, "circulo");
         // key_escape
-        ev.type = key_escape;
-        ev.data1 = key_fire;
+        ev.type = ev_keydown;
+        ev.data1 = key_escape;
         D_PostEvent(&ev);
         break;
 
     case 'S':
         lprintf(LO_INFO, "start");
         // key_menu_enter
-        ev.type = key_menu_enter;
-        ev.data1 = key_fire;
+        ev.type = ev_keydown;
+        ev.data1 = key_menu_enter;
         D_PostEvent(&ev);
         break;
 
