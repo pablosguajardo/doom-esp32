@@ -112,54 +112,54 @@ void readCommands(char command)
     case 'F':
         moveForward = true;
         lprintf(LO_INFO, "empiezo a moverme hacia adelante");
-        ev.type = ev_keydown;
-        ev.data1 = key_up;
-        D_PostEvent(&ev);
         break;
         /* towards the rear */
     case 'T':
         lprintf(LO_INFO, "empiezo a moverme hacia atras");
         moveBackward = true;
-        ev.type = ev_keydown;
-        ev.data1 = key_down;
-        D_PostEvent(&ev);
         break;
         /* Left */
     case 'L':
         moveLeft = true;
         lprintf(LO_INFO, "empiezo a moverme hacia la izquierda");
-        ev.type = ev_keydown;
-        ev.data1 = key_left;
-        D_PostEvent(&ev);
         break;
         /* Right */
     case 'R':
         moveRight = true;
         lprintf(LO_INFO, "empiezo a moverme hacia la derecha");
-        ev.type = ev_keydown;
-        ev.data1 = key_right;
-        D_PostEvent(&ev);
         break;
 
     // MOV: release
     case 'f':
         moveForward = false;
         lprintf(LO_INFO, "dejo de moverme hacia adelante");
+        ev.type = ev_keyup;
+        ev.data1 = key_up;
+        D_PostEvent(&ev);
         break;
 
     case 't':
         moveBackward = false;
         lprintf(LO_INFO, "dejo de moverme hacia atras");
+        ev.type = ev_keyup;
+        ev.data1 = key_backward;
+        D_PostEvent(&ev);
         break;
 
     case 'l':
         moveLeft = false;
         lprintf(LO_INFO, "dejo de moverme hacia la izquierda");
+        ev.type = ev_keyup;
+        ev.data1 = key_left;
+        D_PostEvent(&ev);
         break;
 
     case 'r':
         moveRight = false;
         lprintf(LO_INFO, "dejo de moverme hacia la derecha");
+        ev.type = ev_keyup;
+        ev.data1 = key_right;
+        D_PostEvent(&ev);
         break;
 
     // Acciones: press
@@ -213,33 +213,51 @@ void readCommands(char command)
     // Acciones: release
     case 'd':
         lprintf(LO_INFO, "suelto cuadrado");
+        ev.type = ev_keyup;
+        ev.data1 = key_fire;
+        D_PostEvent(&ev);
         break;
 
     case 'a':
         lprintf(LO_INFO, "suelto triangulo");
+        ev.type = ev_keyup;
+        ev.data1 = key_weapontoggle;
+        D_PostEvent(&ev);
         break;
 
     case 'c':
         lprintf(LO_INFO, "suelto cross");
+        ev.type = ev_keyup;
+        ev.data1 = key_use;
+        D_PostEvent(&ev);
         break;
 
     case 'b':
         lprintf(LO_INFO, "suelto circulo");
+        ev.type = ev_keyup;
+        ev.data1 = key_escape;
+        D_PostEvent(&ev);
         break;
 
     case 's':
         lprintf(LO_INFO, "suelto start");
+        ev.type = ev_keyup;
+        ev.data1 = key_menu_enter;
+        D_PostEvent(&ev);
         break;
 
     case 'p':
         lprintf(LO_INFO, "suelto pause");
+        ev.type = ev_keyup;
+        ev.data1 = key_pause;
+        D_PostEvent(&ev);
         break;
 
     default:
         printf("comando no reconocido: '%c'\n", command);
         break;
     }
-    // updateMovement();
+     updateMovement();
 }
 void updateMovement()
 {
@@ -254,34 +272,70 @@ void updateMovement()
     if (moveForward && moveLeft && !moveBackward && !moveRight)
     {
         lprintf(LO_INFO, "me muevo diagonal adelante-izquierda");
+        ev.type = ev_keydown;
+        ev.data1 = key_up;
+        D_PostEvent(&ev);
+        ev.type = ev_keydown;
+        ev.data1 = key_left;
+        D_PostEvent(&ev);
     }
     else if (moveForward && moveRight && !moveBackward && !moveLeft)
     {
         lprintf(LO_INFO, "me muevo diagonal adelante-derecha");
+        ev.type = ev_keydown;
+        ev.data1 = key_up;
+        D_PostEvent(&ev);
+        ev.type = ev_keydown;
+        ev.data1 = key_right;
+        D_PostEvent(&ev);
     }
     else if (moveBackward && moveLeft && !moveForward && !moveRight)
     {
         lprintf(LO_INFO, "me muevo diagonal atras-izquierda");
+         ev.type = ev_keydown;
+        ev.data1 = key_down;
+        D_PostEvent(&ev);
+        ev.type = ev_keydown;
+        ev.data1 = key_left;
+        D_PostEvent(&ev);
     }
     else if (moveBackward && moveRight && !moveForward && !moveLeft)
     {
         lprintf(LO_INFO, "me muevo diagonal atras-derecha");
+         ev.type = ev_keydown;
+        ev.data1 = key_down;
+        D_PostEvent(&ev);
+        ev.type = ev_keydown;
+        ev.data1 = key_right;
+        D_PostEvent(&ev);
     }
     else if (moveForward && !moveBackward)
     {
         lprintf(LO_INFO, "me muevo hacia adelante");
+        ev.type = ev_keydown;
+        ev.data1 = key_up;
+        D_PostEvent(&ev);
     }
     else if (moveBackward && !moveForward)
     {
         lprintf(LO_INFO, "me muevo hacia atras");
+         ev.type = ev_keydown;
+        ev.data1 = key_down;
+        D_PostEvent(&ev);
     }
     else if (moveLeft && !moveRight)
     {
         lprintf(LO_INFO, "me muevo hacia la izquierda");
+        ev.type = ev_keydown;
+        ev.data1 = key_left;
+        D_PostEvent(&ev);
     }
     else if (moveRight && !moveLeft)
     {
         lprintf(LO_INFO, "me muevo hacia la derecha");
+        ev.type = ev_keydown;
+        ev.data1 = key_right;
+        D_PostEvent(&ev);
     }
 }
 
