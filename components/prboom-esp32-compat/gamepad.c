@@ -18,7 +18,6 @@
 // FOR BT:
 #include "sdkconfig.h"
 
-
 #define JOYSTICK_OPTION CONFIG_HW_JOYSTICK_OPTION
 
 int usejoystick = 0;
@@ -27,12 +26,10 @@ int joyright = 0;
 int joyup = 0;
 int joydown = 0;
 
-
 bool moveForward = false;
 bool moveBackward = false;
 bool moveLeft = false;
 bool moveRight = false;
-
 
 /*
 ESP32-S3 SAFE GPIO MAP (based on your hardware)
@@ -103,138 +100,190 @@ static const JsKeyMap keymap[] = {
     {0, NULL},
 };
 
-
-void readCommands(char command) {
-
+void readCommands(char command)
+{
+    event_t ev;
     printf("command: '%c'\n", command);
 
-    switch (command) {
-      // Movimiento: press
-      case 'F':
+    switch (command)
+    {
+        // MOV: press
+        /* Forward */
+    case 'F':
         moveForward = true;
-        lprintf(LO_INFO,"empiezo a moverme hacia adelante");
+        lprintf(LO_INFO, "empiezo a moverme hacia adelante");
+        ev.type = ev_keydown;
+        ev.data1 = key_up;
+        D_PostEvent(&ev);
         break;
-
-      case 'B':
+        /* towards the rear */
+    case 'T':
+        lprintf(LO_INFO, "empiezo a moverme hacia atras");
         moveBackward = true;
-        lprintf(LO_INFO,"empiezo a moverme hacia atras");
+        ev.type = ev_keydown;
+        ev.data1 = key_down;
+        D_PostEvent(&ev);
         break;
-
-      case 'L':
+        /* Left */
+    case 'L':
         moveLeft = true;
-        lprintf(LO_INFO,"empiezo a moverme hacia la izquierda");
+        lprintf(LO_INFO, "empiezo a moverme hacia la izquierda");
+        ev.type = ev_keydown;
+        ev.data1 = key_left;
+        D_PostEvent(&ev);
         break;
-
-      case 'R':
+        /* Right */
+    case 'R':
         moveRight = true;
-        lprintf(LO_INFO,"empiezo a moverme hacia la derecha");
+        lprintf(LO_INFO, "empiezo a moverme hacia la derecha");
+        ev.type = ev_keydown;
+        ev.data1 = key_right;
+        D_PostEvent(&ev);
         break;
 
-      // Movimiento: release
-      case 'f':
+    // MOV: release
+    case 'f':
         moveForward = false;
-        lprintf(LO_INFO,"dejo de moverme hacia adelante");
+        lprintf(LO_INFO, "dejo de moverme hacia adelante");
         break;
 
-      case 'b':
+    case 't':
         moveBackward = false;
-        lprintf(LO_INFO,"dejo de moverme hacia atras");
+        lprintf(LO_INFO, "dejo de moverme hacia atras");
         break;
 
-      case 'l':
+    case 'l':
         moveLeft = false;
-        lprintf(LO_INFO,"dejo de moverme hacia la izquierda");
+        lprintf(LO_INFO, "dejo de moverme hacia la izquierda");
         break;
 
-      case 'r':
+    case 'r':
         moveRight = false;
-        lprintf(LO_INFO,"dejo de moverme hacia la derecha");
+        lprintf(LO_INFO, "dejo de moverme hacia la derecha");
         break;
 
-      // Acciones: press
-      case 'S':
-        lprintf(LO_INFO,"cuadrado");
+    // Acciones: press
+    /* Fire */
+    case 'D':
+        lprintf(LO_INFO, "Fire");
+        ev.type = ev_keydown;
+        ev.data1 = key_fire;
+        D_PostEvent(&ev);
         break;
 
-      case 'T':
-        lprintf(LO_INFO,"triangulo");
+    case 'A':
+        lprintf(LO_INFO, "triangulo");
+        // key_weapontoggle
+        ev.type = key_weapontoggle;
+        ev.data1 = key_fire;
+        D_PostEvent(&ev);
         break;
 
-      case 'X':
-        lprintf(LO_INFO,"cross");
+    case 'C':
+        lprintf(LO_INFO, "cross");
+        // key_use
+        ev.type = key_use;
+        ev.data1 = key_fire;
+        D_PostEvent(&ev);
         break;
 
-      case 'C':
-        lprintf(LO_INFO,"circulo");
+    case 'B':
+        lprintf(LO_INFO, "circulo");
+        // key_escape
+        ev.type = key_escape;
+        ev.data1 = key_fire;
+        D_PostEvent(&ev);
         break;
 
-      case 'A':
-        lprintf(LO_INFO,"start");
+    case 'S':
+        lprintf(LO_INFO, "start");
+        // key_menu_enter
+        ev.type = key_menu_enter;
+        ev.data1 = key_fire;
+        D_PostEvent(&ev);
         break;
 
-      case 'P':
-        lprintf(LO_INFO,"pause");
+    case 'P':
+        lprintf(LO_INFO, "Pause");
+        ev.type = ev_keydown;
+        ev.data1 = key_pause;
+        D_PostEvent(&ev);
         break;
 
-      // Acciones: release
-      case 's':
-        lprintf(LO_INFO,"suelto cuadrado");
+    // Acciones: release
+    case 'd':
+        lprintf(LO_INFO, "suelto cuadrado");
         break;
 
-      case 't':
-        lprintf(LO_INFO,"suelto triangulo");
+    case 'a':
+        lprintf(LO_INFO, "suelto triangulo");
         break;
 
-      case 'x':
-        lprintf(LO_INFO,"suelto cross");
+    case 'c':
+        lprintf(LO_INFO, "suelto cross");
         break;
 
-      case 'c':
-        lprintf(LO_INFO,"suelto circulo");
+    case 'b':
+        lprintf(LO_INFO, "suelto circulo");
         break;
 
-      case 'a':
-        lprintf(LO_INFO,"suelto start");
+    case 's':
+        lprintf(LO_INFO, "suelto start");
         break;
 
-      case 'p':
-        lprintf(LO_INFO,"suelto pause");
+    case 'p':
+        lprintf(LO_INFO, "suelto pause");
         break;
 
-      default:
-       printf("comando no reconocido: '%c'\n", command);
+    default:
+        printf("comando no reconocido: '%c'\n", command);
         break;
     }
- updateMovement();
+    // updateMovement();
 }
-void updateMovement() {
-   /*static unsigned long lastMoveMs = 0;
-    const unsigned long moveInterval = 200;
+void updateMovement()
+{
+    /*static unsigned long lastMoveMs = 0;
+     const unsigned long moveInterval = 200;
 
-    if (millis() - lastMoveMs < moveInterval) {
-        return;
+     if (millis() - lastMoveMs < moveInterval) {
+         return;
+     }
+     lastMoveMs = millis();*/
+
+    if (moveForward && moveLeft && !moveBackward && !moveRight)
+    {
+        lprintf(LO_INFO, "me muevo diagonal adelante-izquierda");
     }
-    lastMoveMs = millis();*/
-
-    if (moveForward && moveLeft && !moveBackward && !moveRight) {
-        lprintf(LO_INFO,"me muevo diagonal adelante-izquierda");
-    } else if (moveForward && moveRight && !moveBackward && !moveLeft) {
-        lprintf(LO_INFO,"me muevo diagonal adelante-derecha");
-    } else if (moveBackward && moveLeft && !moveForward && !moveRight) {
-        lprintf(LO_INFO,"me muevo diagonal atras-izquierda");
-    } else if (moveBackward && moveRight && !moveForward && !moveLeft) {
-        lprintf(LO_INFO,"me muevo diagonal atras-derecha");
-    } else if (moveForward && !moveBackward) {
-        lprintf(LO_INFO,"me muevo hacia adelante");
-    } else if (moveBackward && !moveForward) {
-        lprintf(LO_INFO,"me muevo hacia atras");
-    } else if (moveLeft && !moveRight) {
-        lprintf(LO_INFO,"me muevo hacia la izquierda");
-    } else if (moveRight && !moveLeft) {
-        lprintf(LO_INFO,"me muevo hacia la derecha");
+    else if (moveForward && moveRight && !moveBackward && !moveLeft)
+    {
+        lprintf(LO_INFO, "me muevo diagonal adelante-derecha");
+    }
+    else if (moveBackward && moveLeft && !moveForward && !moveRight)
+    {
+        lprintf(LO_INFO, "me muevo diagonal atras-izquierda");
+    }
+    else if (moveBackward && moveRight && !moveForward && !moveLeft)
+    {
+        lprintf(LO_INFO, "me muevo diagonal atras-derecha");
+    }
+    else if (moveForward && !moveBackward)
+    {
+        lprintf(LO_INFO, "me muevo hacia adelante");
+    }
+    else if (moveBackward && !moveForward)
+    {
+        lprintf(LO_INFO, "me muevo hacia atras");
+    }
+    else if (moveLeft && !moveRight)
+    {
+        lprintf(LO_INFO, "me muevo hacia la izquierda");
+    }
+    else if (moveRight && !moveLeft)
+    {
+        lprintf(LO_INFO, "me muevo hacia la derecha");
     }
 }
-
 
 void gamepadPoll(void)
 {

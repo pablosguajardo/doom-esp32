@@ -12,8 +12,15 @@
 * **Python**: 3.13.0
 * ESP32-S3 board
 
+
+
 ---
 
+## ESP-IDF
+
+For ESP-IDF You can find the getting started guide [here](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/get-started/).  
+
+---
 ## Run Esp-Idf manually
 ```bat
 C:\esp\v5.2\esp-idf\export.bat

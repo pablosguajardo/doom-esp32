@@ -16,6 +16,7 @@
 #include "host/util/util.h"
 #include "services/gap/ble_svc_gap.h"
 #include "services/gatt/ble_svc_gatt.h"
+#include "gamepad.h"
 
 #define DEVICE_NAME "ESP32-DOOM-Joystick"
 #define RX_QUEUE_LEN 64
@@ -61,8 +62,10 @@ static int rx_chr_access_cb(uint16_t conn_handle,
 
     for (uint16_t i = 0; i < copy_len; i++) {
         char c = buf[i];
-        xQueueSend(rx_queue, &c, 0);
         ESP_LOGI(TAG, "RX: '%c'", c);
+
+        /* Directly forward command to Doom gamepad logic */
+        readCommands(c);
     }
 
     return 0;
