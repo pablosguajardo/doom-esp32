@@ -31,6 +31,26 @@ bool moveBackward = false;
 bool moveLeft = false;
 bool moveRight = false;
 
+/* ================= BT INPUT MODE ================= */
+
+#define BT_INPUT_MODE_HOLD 1
+#define BT_INPUT_MODE_TAP 2
+
+#ifndef BT_INPUT_MODE
+#define BT_INPUT_MODE BT_INPUT_MODE_TAP /* Default = TAP mode */
+#endif
+
+#define BT_TAP_FORWARD_TICS 2
+#define BT_TAP_SIDE_TICS 1
+static int tapButtonTicks = 1;
+
+static int tapForwardTicks = 0;
+static int tapBackwardTicks = 0;
+static int tapLeftTicks = 0;
+static int tapRightTicks = 0;
+
+#define TAP_INTERVAL_MS 250
+
 /*
 ESP32-S3 SAFE GPIO MAP (based on your hardware)
 
@@ -100,14 +120,141 @@ static const JsKeyMap keymap[] = {
     {0, NULL},
 };
 
+void processTap(int ticks, int key)
+{
+    printf("(%d) down\n", key);
+    event_t ev;
+    ev.type = ev_keydown;
+    ev.data1 = key;
+    D_PostEvent(&ev);
+
+    // TickType_t deadline = xTaskGetTickCount() + pdMS_TO_TICKS(ticks * TAP_INTERVAL_MS);
+    TickType_t start = xTaskGetTickCount();
+    TickType_t waitTicks = pdMS_TO_TICKS(ticks * TAP_INTERVAL_MS);
+
+    printf("start=%lu waitTicks=%lu\n", (unsigned long)start, (unsigned long)waitTicks);
+
+    TickType_t now;
+    bool cont = true;
+    while (cont)
+    {
+        // if ((xTaskGetTickCount() - waitTicks) >= 0)
+        now = xTaskGetTickCount();
+
+        if ((now - start) >= waitTicks)
+        {
+
+            cont = false;
+            ev.type = ev_keyup;
+            ev.data1 = key;
+            D_PostEvent(&ev);
+
+            printf("up: (%d) ", key);
+            printf("start=%lu waitTicks=%lunow=%lu\n", (unsigned long)start, (unsigned long)waitTicks, (unsigned long)now);
+        }
+        vTaskDelay(1);
+    }
+}
 void readCommands(char command)
 {
     event_t ev;
-    printf("command: '%c'\n", command);
+    printf("command: '%c' ", command);
 
     switch (command)
     {
-        // MOV: press
+#if BT_INPUT_MODE == BT_INPUT_MODE_TAP
+
+        /* TAP MODE: impulse movement */
+
+    case 'F':
+        tapForwardTicks = BT_TAP_FORWARD_TICS;
+        processTap(tapForwardTicks, key_up);
+        break;
+
+    case 'T':
+        tapBackwardTicks = BT_TAP_FORWARD_TICS;
+        processTap(tapBackwardTicks, key_down);
+        break;
+
+    case 'L':
+        tapLeftTicks = BT_TAP_SIDE_TICS;
+        processTap(tapLeftTicks, key_left);
+        break;
+
+    case 'R':
+        tapRightTicks = BT_TAP_SIDE_TICS;
+        processTap(tapRightTicks, key_right);
+        break;
+    // Acciones: press
+    /* Fire */
+    case 'D':
+        lprintf(LO_INFO, "Fire");
+        // ev.type = ev_keydown;
+        // ev.data1 = key_fire;
+        // D_PostEvent(&ev);
+        // ev.type = ev_keyup;
+        // D_PostEvent(&ev);
+        processTap(tapButtonTicks, key_fire);
+        break;
+
+    case 'A':
+        lprintf(LO_INFO, "triangulo");
+        // key_weapontoggle
+        // ev.type = ev_keydown;
+        // ev.data1 = key_weapontoggle;
+        // D_PostEvent(&ev);
+        // ev.type = ev_keyup;
+        // D_PostEvent(&ev);
+        processTap(tapButtonTicks, key_weapontoggle);
+        break;
+
+    case 'C':
+        lprintf(LO_INFO, "cross");
+        // key_use
+        // ev.type = ev_keydown;
+        // ev.data1 = key_use;
+        // D_PostEvent(&ev);
+        // ev.type = ev_keyup;
+        // D_PostEvent(&ev);
+        processTap(tapButtonTicks, key_use);
+        break;
+
+    case 'B':
+        lprintf(LO_INFO, "circulo");
+        // key_escape
+        // ev.type = ev_keydown;
+        // ev.data1 = key_escape;
+        // D_PostEvent(&ev);
+        // ev.type = ev_keyup;
+        // D_PostEvent(&ev);
+        processTap(tapButtonTicks, key_escape);
+        break;
+
+    case 'S':
+        lprintf(LO_INFO, "start");
+        // key_menu_enter
+        // ev.type = ev_keydown;
+        // ev.data1 = key_menu_enter;
+        // D_PostEvent(&ev);
+        // ev.type = ev_keyup;
+        // D_PostEvent(&ev);
+        processTap(tapButtonTicks, key_menu_enter);
+        break;
+
+    case 'P':
+        lprintf(LO_INFO, "Pause");
+        // ev.type = ev_keydown;
+        // ev.data1 = key_pause;
+        // D_PostEvent(&ev);
+        // ev.type = ev_keyup;
+        // D_PostEvent(&ev);
+
+        processTap(tapButtonTicks, key_pause);
+        break;
+
+#else
+
+        // HOLD MODE (original behavior)
         /* Forward */
     case 'F':
         moveForward = true;
@@ -253,14 +400,23 @@ void readCommands(char command)
         D_PostEvent(&ev);
         break;
 
+#endif
+
     default:
         printf("comando no reconocido: '%c'\n", command);
         break;
     }
-     updateMovement();
+
+#if BT_INPUT_MODE == BT_INPUT_MODE_HOLD
+    updateMovement();
+#endif
 }
 void updateMovement()
 {
+    event_t ev;
+
+    // #if BT_INPUT_MODE == BT_INPUT_MODE_TAP
+
     /*static unsigned long lastMoveMs = 0;
      const unsigned long moveInterval = 200;
 
@@ -292,7 +448,7 @@ void updateMovement()
     else if (moveBackward && moveLeft && !moveForward && !moveRight)
     {
         lprintf(LO_INFO, "me muevo diagonal atras-izquierda");
-         ev.type = ev_keydown;
+        ev.type = ev_keydown;
         ev.data1 = key_down;
         D_PostEvent(&ev);
         ev.type = ev_keydown;
@@ -302,7 +458,7 @@ void updateMovement()
     else if (moveBackward && moveRight && !moveForward && !moveLeft)
     {
         lprintf(LO_INFO, "me muevo diagonal atras-derecha");
-         ev.type = ev_keydown;
+        ev.type = ev_keydown;
         ev.data1 = key_down;
         D_PostEvent(&ev);
         ev.type = ev_keydown;
@@ -319,7 +475,7 @@ void updateMovement()
     else if (moveBackward && !moveForward)
     {
         lprintf(LO_INFO, "me muevo hacia atras");
-         ev.type = ev_keydown;
+        ev.type = ev_keydown;
         ev.data1 = key_down;
         D_PostEvent(&ev);
     }
