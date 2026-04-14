@@ -37,7 +37,7 @@ bool moveRight = false;
 #define BT_INPUT_MODE_TAP 2
 
 #ifndef BT_INPUT_MODE
-#define BT_INPUT_MODE BT_INPUT_MODE_TAP /* Default = TAP mode */
+#define BT_INPUT_MODE BT_INPUT_MODE_HOLD /* Default = TAP mode */
 #endif
 
 #define BT_TAP_FORWARD_TICS 2
@@ -289,7 +289,7 @@ void readCommands(char command)
         moveBackward = false;
         lprintf(LO_INFO, "dejo de moverme hacia atras");
         ev.type = ev_keyup;
-        ev.data1 = key_backward;
+        ev.data1 = key_down;
         D_PostEvent(&ev);
         break;
 
@@ -357,6 +357,28 @@ void readCommands(char command)
         D_PostEvent(&ev);
         break;
 
+    case 'X':
+        lprintf(LO_INFO, "strafeleft");
+        // key_menu_enter
+        ev.type = ev_keydown;
+        ev.data1 = key_strafeleft;
+        D_PostEvent(&ev);
+        break;
+
+    case 'Y':
+        lprintf(LO_INFO, "straferight");
+        ev.type = ev_keydown;
+        ev.data1 = key_straferight;
+        D_PostEvent(&ev);
+        break;
+
+    case 'Z':
+        lprintf(LO_INFO, "straferight");
+        ev.type = ev_keydown;
+        ev.data1 = key_speed;
+        D_PostEvent(&ev);
+        break;
+
     // Acciones: release
     case 'd':
         lprintf(LO_INFO, "suelto cuadrado");
@@ -397,6 +419,28 @@ void readCommands(char command)
         lprintf(LO_INFO, "suelto pause");
         ev.type = ev_keyup;
         ev.data1 = key_pause;
+        D_PostEvent(&ev);
+        break;
+
+     case 'x':
+        lprintf(LO_INFO, "strafeleft end");
+        // key_menu_enter
+        ev.type = ev_keyup;
+        ev.data1 = key_strafeleft;
+        D_PostEvent(&ev);
+        break;
+
+    case 'y':
+        lprintf(LO_INFO, "straferight  end");
+        ev.type = ev_keyup;
+        ev.data1 = key_straferight;
+        D_PostEvent(&ev);
+        break;
+
+    case 'z':
+        lprintf(LO_INFO, "straferight  end");
+        ev.type = ev_keyup;
+        ev.data1 = key_speed;
         D_PostEvent(&ev);
         break;
 
