@@ -6,25 +6,47 @@
 
 ---
 
-## 🧰 Prerequisites
+# 🚀 Overview
 
-* **ESP-IDF**: v5.2
-* **Python**: 3.13.0
-* ESP32-S3 board
+This project runs **DOOM (PrBoom)** on an **ESP32-S3**, with:
+
+- 🎮 GPIO or Bluetooth joystick input  
+- 📺 SPI display support  
+- 🔊 I2S audio output  
+- 💾 External PSRAM support  
+- 📦 Flash-based WAD loading  
+
+Fully built using **ESP-IDF v5.2**.
 
 ---
 
-## ESP-IDF
+# 🧰 Prerequisites
 
-For ESP-IDF You can find the getting started guide [here](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/get-started/).  
+| Tool | Version |
+|------|----------|
+| ESP-IDF | v5.2 |
+| Python | 3.13.0 |
+| Board | ESP32-S3 |
+| WAD | DOOM1.WAD |
+
+ESP-IDF installation guide:  
+👉 https://docs.espressif.com/projects/esp-idf/en/latest/esp32/get-started/
 
 ---
-## Run Esp-Idf manually
+
+# 🖥️ ESP-IDF Environment
+
+## Run ESP-IDF manually
+
 ```bat
 C:\esp\v5.2\esp-idf\export.bat
 ```
 
-## ⚙️ App Configuration
+---
+
+# ⚙️ Configuration
+
+Open menuconfig:
 
 ```bat
 idf.py menuconfig
@@ -32,7 +54,7 @@ idf.py menuconfig
 
 ---
 
-## 🔄 Dependency Changes
+# 🔄 Dependency Changes
 
 ```bat
 idf.py reconfigure
@@ -40,36 +62,35 @@ idf.py reconfigure
 
 ---
 
-## 🏗️ Build
+# 🏗️ Build
 
 ```bat
 idf.py build
 ```
 
-### Clean build (recommended)
+### 🧹 Clean build (recommended)
 
 ```bat
 idf.py fullclean
 ```
 
-### Or run both:
+Or both:
 
 ```bat
 idf.py fullclean build
 ```
 
-### Set target (It is no longer necessary):
+### 🎯 Set target (usually not required)
 
 ```bat
 idf.py set-target esp32s3
 ```
 
-
 ---
 
-## 🚀 Deployment (Step by Step)
+# 🚀 Flashing & Deployment
 
-### 1️- Partition Table
+## ✅ Step 1 – Flash Partition Table
 
 ```bat
 idf.py partition-table
@@ -78,16 +99,16 @@ idf.py -p COM5 partition-table-flash
 
 ---
 
-### 2️- Flash WAD Files
+## ✅ Step 2 – Flash WAD Files
 
-#### CMD
+### CMD
 
 ```cmd
 python "%IDF_PATH%\components\esptool_py\esptool\esptool.py" --chip esp32s3 --port COM5 --baud 230400 write_flash 0x200000 prboom.wad
 python "%IDF_PATH%\components\esptool_py\esptool\esptool.py" --chip esp32s3 --port COM5 --baud 230400 write_flash 0x280000 DOOM1.WAD
 ```
 
-#### PowerShell
+### PowerShell
 
 ```powershell
 python "$env:IDF_PATH\components\esptool_py\esptool\esptool.py" --chip esp32s3 --port COM5 --baud 230400 write_flash 0x200000 prboom.wad
@@ -96,7 +117,7 @@ python "$env:IDF_PATH\components\esptool_py\esptool\esptool.py" --chip esp32s3 -
 
 ---
 
-### 3️- Flash Firmware
+## ✅ Step 3 – Flash Firmware
 
 ```bat
 idf.py -p COM5 flash
@@ -104,9 +125,9 @@ idf.py -p COM5 flash
 
 ---
 
-## ⚡ One-Click Scripts
+# ⚡ One-Click Flash Scripts
 
-### Windows (.bat)
+## 🪟 Windows (.bat)
 
 ```bat
 @echo off
@@ -116,9 +137,7 @@ idf.py -p COM5 flash
 pause
 ```
 
----
-
-### PowerShell (.ps1)
+## 💻 PowerShell (.ps1)
 
 ```powershell
 idf.py fullclean
@@ -128,165 +147,205 @@ idf.py -p COM5 flash
 
 ---
 
-## 🐞 Debugging
+# 🐞 Debugging
 
-### Serial Monitor
+## 🔍 Serial Monitor
 
 ```bat
 idf.py -p COM5 monitor
 ```
 
+Exit with:  
+`Ctrl + ]`
+
 ---
 
-### Decode Backtrace
+## 🧠 Decode Backtrace
 
 ```bat
-xtensa-esp32s3-elf-addr2line -pfiaC -e build\esp-doom.elf 0x4200a7b2:0x3fce6910 0x4200a8d9:0x3fce6940 0x4200a68e:0x3fce6970 0x420116e9:0x3fce69d0 0x4201172a:0x3fce6a00 0x42017061:0x3fce6a40 0x420178dd:0x3fce6a70 0x420181a7:0x3fce6a90 0x4200c37d:0x3fce6ac0 0x4200c212:0x3fce6af0 0x4200b751:0x3fce6b20 0x4200b763:0x3fce6b40 0x420b25e3:0x3fce6b60 0x403778ce:0x3fce6b80 0x4200a4b6:0x3fce6ba0 0x40382b99:0x3fce6bc0
+xtensa-esp32s3-elf-addr2line -pfiaC -e build\esp-doom.elf <addresses>
 ```
 
 ---
 
-## ⚠️ Watchdog
+# ⚠️ Watchdog
 
-Disable if needed:
+If needed, disable:
 
 ```
 Component config
   → ESP System Settings
       → [ ] Interrupt watchdog
 ```
----
-## 🎮 Controls
 
-SET: HW_JOYSTICK_OPTION 
+---
+
+# 🎮 Controls
+
+## 🔧 Select Input Mode
+
+`CONFIG_HW_JOYSTICK_OPTION`
 Default: 2
-Available options: 
+
+| Value | Mode |
+|-------|------|
+| 1 | GPIO buttons |
+| 2 | Bluetooth joystick (BLE) |
+
+ 
 if you set it to 1, it compiles to be used with GPIO buttons; 
-if you set it to 2, it compiles to use a joystick via Bluetooth.
+if you set it to 2, it compiles to use a virtual "joystick" via Bluetooth.
 
-run:
+
+Change via:
+
+```bat
 idf.py menuconfig
+```
 
- ESP32-Doom platform-specific configuration →
-	(2) Options: 1=GPIO buttons, 2= BT joystick  
+Path:
 
-### Bluetooth Configuration (HW_JOYSTICK_OPTION = 2)
+```
+ESP32-Doom platform-specific configuration
+  → (1/2) HW_JOYSTICK_OPTION
+```
 
 ---
-🔧 Required configuration (VERY important)
+
+# 📡 Bluetooth (BLE Mode)
+
+When `HW_JOYSTICK_OPTION = 2`:
+
+
+✅ Uses NimBLE (BLE only)  
+✅ Nordic UART style input  
+✅ Supports HOLD and TAP input modes  
+
+### Required menuconfig settings:
 
 Run:
-
+```bat
 idf.py menuconfig
+```
 
-
-📍 Component config
-  -> Bluetooth
+```
+Component config
+  → Bluetooth
      [*] Bluetooth
-     Host ---> NimBLE - BLE only
-     Controller ---> Enabled
+     Host → NimBLE - BLE only
+     Controller → Enabled
+```
 
-
----
-
-### (GPIO)Configuration (HW_JOYSTICK_OPTION = 1)
-
-### Directions
-
-| Action | GPIO |
-| ------ | ---- |
-| UP     | 8    |
-| DOWN   | 9    |
-| LEFT   | 10   |
-| RIGHT  | 11   |
-
-### Main Actions
-
-| Action | GPIO |
-| ------ | ---- |
-| FIRE   | 12   |
-| USE    | 2    |
-| RUN    | 16   |
-| STRAFE | 18   |
-
-### System
-
-| Action | GPIO |
-| ------ | ---- |
-| ESC    | 13   |
-| MAP    | 14   |
-| ENTER  | 19   |
-| PAUSE  | 20   |
+You can use the bacon application to create a generic virtual joystick:
+👉 https://play.google.com/store/apps/details?id=com.jerameeldelosreyes.bacon
 
 ---
 
-## 🔊 Audio
+# 🎛️ GPIO Configuration (HW_JOYSTICK_OPTION = 1)
+
+## 🧭 Directions
+
+| Action | GPIO |
+|--------|------|
+| UP     | 8 |
+| DOWN   | 9 |
+| LEFT   | 10 |
+| RIGHT  | 11 |
+
+## 🔫 Main Actions
+
+| Action | GPIO |
+|--------|------|
+| FIRE   | 12 |
+| USE    | 2 |
+| RUN    | 16 |
+| STRAFE | 18 |
+
+## 🖥️ System
+
+| Action | GPIO |
+|--------|------|
+| ESC    | 13 |
+| MAP    | 14 |
+| ENTER  | 19 |
+| PAUSE  | 20 |
+
+---
+# 🎛️ GPIO Configuration Audio/Display
+
+# 🔊 Audio (I2S)
 
 | Signal | GPIO |
-| ------ | ---- |
-| BCLK   | 17   |
-| WS     | 47   |
-| DOUT   | 15   |
+|--------|------|
+| BCLK   | 17 |
+| WS     | 47 |
+| DOUT   | 15 |
 
 ---
 
-## 📺 Display
+# 📺 Display (SPI)
 
 | Signal | GPIO |
-| ------ | ---- |
-| MOSI   | 6    |
-| CLK    | 7    |
-| CS     | 5    |
-| DC     | 4    |
-| RST    | 48   |
-| BCKL   | 45   |
+|--------|------|
+| MOSI   | 6 |
+| CLK    | 7 |
+| CS     | 5 |
+| DC     | 4 |
+| RST    | 48 |
+| BCKL   | 45 |
 
 ---
 
-## 🧠 Notes
+# 🧠 Notes
 
-* Flash order matters: **partition → firmware → WAD**
-* WAD must match partition offsets
-* Avoid flash/PSRAM pins
-* Use external power for peripherals
-
----
-
-## ⭐ Tips
-
-* Use `idf.py monitor` with `Ctrl+]` to exit
-* Use `idf.py flash -v` to debug flashing
-* Keep WAD flashing separate from firmware
+- ✅ Flash order matters: **partition → firmware → WAD**
+- ✅ WAD must match partition offsets
+- ✅ Avoid flash/PSRAM pins
+- ✅ External power recommended for peripherals
+- ✅ BLE mode supports TAP impulse input
 
 ---
 
-## Known Bugs
-----------
+# ⭐ Tips
 
-- ESP32-DOOM does not support saving or loading of savegames.
-
-
-## Credits
--------
-
-Doom is released by iD software in 1999 under the Gnu GPL. PrBoom is a modification of this code; its authors are credited in 
-the ``components/prboom/AUTHORS`` file. The ESP32 modifications are done by Espressif and licensed under the Apache license, version 2.0.
-
-
-## License
--------
-
-This project is open source and freely available for anyone to use, modify, and distribute.
-
-You are welcome to:
-- Use the code for personal or commercial projects
-- Modify and adapt it to your needs
-- Share improvements with the community
-
-This repository is provided “as is”, without warranty of any kind.
-
-If you find this project useful, contributions, feedback, and improvements are always welcome.
+- Use `idf.py flash -v` for verbose flashing
+- Use `idf.py -p COM5 monitor` for debug, with `Ctrl+]` to exit
+- Keep WAD flashing separate from firmware
+- Use external power when using display + audio
+- PSRAM is recommended for stable performance
 
 ---
 
-🚀 Ready to run DOOM on ESP32-S3
+# 🐞 Known Limitations
+
+- ❌ Savegames are not supported
+- ❌ Bluetooth Classic is NOT supported (ESP32-S3 is BLE only)
+
+---
+
+# 👥 Credits
+
+- DOOM source released by **id Software (1999)** under GNU GPL  
+- **PrBoom** authors credited in `components/prboom/AUTHORS`  
+- ESP32 adaptations by **Espressif Systems** (Apache 2.0 License)
+
+---
+
+# 📜 License
+
+This project is open source and freely available.
+
+✅ You may use it  
+✅ Modify it  
+✅ Distribute it  
+✅ Use it commercially  
+
+Provided “as is” without warranty.
+
+Contributions and improvements are welcome!
+
+---
+
+# 🚀 Ready to run DOOM on ESP32-S3
+
+Let’s rip and tear 🔥

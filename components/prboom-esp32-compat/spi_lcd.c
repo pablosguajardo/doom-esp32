@@ -30,23 +30,13 @@
 
 #include "sdkconfig.h"
 
-//PSG: TODO leer de la configuracion:
-#if 1
 #define PIN_NUM_MISO -1
-#define PIN_NUM_MOSI 6
-#define PIN_NUM_CLK  7
-#define PIN_NUM_CS   5
-#define PIN_NUM_DC   4
-#define PIN_NUM_RST  48
-#define PIN_NUM_BCKL 45
-#else
 #define PIN_NUM_MOSI CONFIG_HW_LCD_MOSI_GPIO
 #define PIN_NUM_CLK  CONFIG_HW_LCD_CLK_GPIO
 #define PIN_NUM_CS   CONFIG_HW_LCD_CS_GPIO
 #define PIN_NUM_DC   CONFIG_HW_LCD_DC_GPIO
 #define PIN_NUM_RST  CONFIG_HW_LCD_RESET_GPIO
 #define PIN_NUM_BCKL CONFIG_HW_LCD_BL_GPIO
-#endif
 
 //You want this, especially at higher framerates. The 2nd buffer is allocated in iram anyway, so isn't really in the way.
 #define DOUBLE_BUFFER
