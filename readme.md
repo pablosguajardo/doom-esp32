@@ -274,12 +274,25 @@ You can use the bacon application to create a generic virtual joystick:
 # 🎛️ GPIO Configuration Audio/Display
 
 # 🔊 Audio (I2S)
+| MAX98357A | GPIO |
+|------------|-------------|
+| VCC | 5V (mejor potencia) o 3.3V |
+| GND | GND |
+| BCLK | 17 |
+| LRC (WS) | 47 |
+| DIN (DOUT)| 15 |
+| SD | VCC |
+| GAIN | GND |
 
-| Signal | GPIO |
-|--------|------|
-| BCLK   | 17 |
-| WS     | 47 |
-| DOUT   | 15 |
+Check the voltages if there is no sound:
+
+Connect the multimeter to:
+
+- GPIO17 → you should see an average of ~1V–2V (activity)
+- GPIO47 → ~1V average
+
+If both are solid at 0V → the task is not writing.
+
 
 ---
 

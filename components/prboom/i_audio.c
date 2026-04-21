@@ -212,7 +212,7 @@ void I_ShutdownSound(void)
 
 void I_InitSound(void) {
 	I_InitMusic();
-	//PSG: sndhw_init(RATE, snd_cb);
+	sndhw_init(RATE, snd_cb);
 
 	// Finished initialization.
     lprintf(LO_INFO,"I_InitSound: sound ready");

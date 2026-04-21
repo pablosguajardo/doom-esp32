@@ -56,13 +56,13 @@ void doomEngineTask(void *pvParameters)
     char const *argv[] = {
         "doom",
         "-cout", "ICWEFDA",
-        "nosound",
-        "nomusic",
-        "nosfx",
+        // "nosound",
+        // "nomusic",
+        // "nosfx",
         NULL
     };
 
-    doom_main(6, argv);
+    doom_main(3, argv); //este valor se cambia si se cambian los parametros de argv
 }
 
 void app_main()
