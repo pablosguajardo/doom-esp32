@@ -276,7 +276,7 @@ You can use the bacon application to create a generic virtual joystick:
 # 🔊 Audio (I2S)
 | MAX98357A | GPIO |
 |------------|-------------|
-| VCC | 5V (mejor potencia) o 3.3V |
+| VCC | 3.3V |
 | GND | GND |
 | BCLK | 17 |
 | LRC (WS) | 47 |
@@ -300,8 +300,8 @@ If both are solid at 0V → the task is not writing.
 
 | Signal | GPIO |
 |--------|------|
-| MOSI   | 6 |
-| CLK    | 7 |
+| MOSI (SDA)   | 6 |
+| CLK (SCL)   | 7 |
 | CS     | 5 |
 | DC     | 4 |
 | RST    | 48 |

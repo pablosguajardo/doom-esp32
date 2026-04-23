@@ -130,11 +130,11 @@ static void snd_cb(int16_t *buf, int len) {
 	imf_player_tick(len);
 	Chip__GenerateBlock2(&imfplayer.opl, len, oplblk);
 	for (int p=0; p<len; p++) {
-        int samp = oplblk[p] * 2; // mix in music (reduced gain to avoid saturation)
+        int samp = oplblk[p] * 2;// antes: * 4; 
 		for (int i=0; i<NO_SLOT; i++) {
 			if (slot[i].samp) {
 				//mix in sound fx slot
-				samp+=(slot[i].samp[FROM_FIXED(slot[i].pos)])*128;
+                samp += (slot[i].samp[FROM_FIXED(slot[i].pos)]) * 128;
 				//increase, unload if end
 				slot[i].pos+=slot[i].rate_inc;
 				if (slot[i].pos > slot[i].len) {
