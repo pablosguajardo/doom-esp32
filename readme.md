@@ -235,11 +235,97 @@ Component config
      Host → NimBLE - BLE only
      Controller → Enabled
 ```
-
+## 🎮 BLE Joystick for Android
 You can use the bacon application to create a generic virtual joystick:
 👉 https://play.google.com/store/apps/details?id=com.jerameeldelosreyes.bacon
 
+![alt tag](https://raw.githubusercontent.com/pablosguajardo/templates/main/img/doom/Bacon_joy.jpg)
+
+### Button Mapping (Virtual Joystick Configuration)
+
+In BLE mode, the ESP32 receives **single-character commands** via Nordic UART.
+You must configure each button in the Bacon app to send the following characters.
+
+### 🧭 Movement
+
+| Action | Press | Release (HOLD mode only) |
+|--------|--------|--------------------------|
+| Forward | `F` | `f` |
+| Backward | `T` | `t` |
+| Left | `L` | `l` |
+| Right | `R` | `r` |
+
 ---
+
+### 🔫 Main Actions
+
+| Action | Press | Release (HOLD mode only) |
+|--------|--------|--------------------------|
+| Fire | `D` | `d` |
+| Use / Open | `C` | `c` |
+| Weapon Toggle | `A` | `a` |
+| Pause | `P` | `p` |
+| Menu Enter | `S` | `s` |
+| Escape | `B` | `b` |
+
+---
+
+### 🏃 Advanced Movement (HOLD mode only)
+
+| Action | Press | Release |
+|--------|--------|----------|
+| Strafe Left | `X` | `x` |
+| Strafe Right | `Y` | `y` |
+| Run (Speed) | `Z` | `z` |
+
+---
+
+## ⚙️ HOLD vs TAP Mode
+
+Defined in:
+
+```
+components/prboom-esp32-compat/gamepad.c
+```
+
+```
+#define BT_INPUT_MODE_HOLD 1
+#define BT_INPUT_MODE_TAP  2
+```
+
+### ✅ HOLD Mode
+- Button sends keydown on uppercase
+- Button sends keyup on lowercase
+- Continuous movement while pressed
+- Recommended for virtual joystick apps
+
+### ✅ TAP Mode
+- Uppercase triggers a short impulse
+- No release character required
+- Good for button-style input
+
+Default is **HOLD mode**.
+
+---
+
+## 📱 How to Configure Bacon App
+
+1. Create a button.
+2. Set **Action Type → Send Text**
+3. Enter the corresponding character (example: `F`)
+4. For HOLD mode:
+   - Configure "Button Down" → uppercase
+   - Configure "Button Up" → lowercase
+
+Example:
+- Left button:
+  - Down → `L`
+  - Up → `l`
+  
+![alt tag](https://raw.githubusercontent.com/pablosguajardo/templates/main/img/doom/Bacon_config.jpg)
+
+---
+
 
 # 🎛️ GPIO Configuration (HW_JOYSTICK_OPTION = 1)
 
