@@ -5,7 +5,10 @@
 ![Status](https://img.shields.io/badge/Status-Working-success)
 
 ---
+## Video:
+[![VIDEO](https://i.ytimg.com/vi/qNEunaMxIuw/oardefault.jpg?sqp=-oaymwEoCM0CENAFSFqQAgHyq4qpAxcIARUAAIhC2AEB4gEKCBgQAhgGOAFAAQ==&rs=AOn4CLCoRj9TizZzFQM5cpn4D6y-Ckk-OA&usqp=CCk)](https://www.youtube.com/shorts/qNEunaMxIuw)
 
+---
 # 🚀 Overview
 
 This project runs **DOOM (PrBoom)** on an **ESP32-S3**, with:
